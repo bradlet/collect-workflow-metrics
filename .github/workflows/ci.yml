@@ -61,5 +61,8 @@ jobs:
 
       - name: Print Output
         id: output
-        run: echo "workflow_runtime_ms ${{ steps.test-action.outputs.workflow_runtime_ms }} 
-          workflow_runtime_human ${{ steps.test-action.outputs.workflow_runtime_human }}"
+        run:
+          echo "workflow_runtime_ms ${{
+          steps.test-action.outputs.workflow_runtime_ms }}
+          workflow_runtime_human ${{
+          steps.test-action.outputs.workflow_runtime_human }}"

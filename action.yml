@@ -8,14 +8,20 @@ branding:
 
 inputs:
   github_token:
-    description: This should be a token with access to your repository scoped in as a secret.
+    description:
+      This should be a token with access to your repository scoped in as a
+      secret.
     required: true
 
 outputs:
   workflow_runtime_ms:
-    description: The amount of time it took the calling workflow to run up until this action, in milliseconds.
+    description:
+      The amount of time it took the calling workflow to run up until this
+      action, in milliseconds.
   workflow_runtime_human:
-    description: The amount of time it took the calling workflow to run up until this action, in a human-readable format.
+    description:
+      The amount of time it took the calling workflow to run up until this
+      action, in a human-readable format.
 
 runs:
   using: node20

@@ -12,9 +12,9 @@ need to perform some initial setup steps before you can develop your action.
 >
 > You'll need to have a reasonably modern version of
 > [Node.js](https://nodejs.org) handy. If you are using a version manager like
-> [`nvm`](https://github.com/nvm-sh/nvm), you can run `nvm use` in the
-> root of your repository to install the version specified in
-> [`.nvmrc`](./.nvmrc). Otherwise, 20.x or later should work!
+> [`nvm`](https://github.com/nvm-sh/nvm), you can run `nvm use` in the root of
+> your repository to install the version specified in [`.nvmrc`](./.nvmrc).
+> Otherwise, 20.x or later should work!
 
 1. :hammer_and_wrench: Install the dependencies
 
