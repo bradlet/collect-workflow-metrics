@@ -50,8 +50,8 @@ describe('main.js', () => {
           getWorkflowRunAttempt: jest
             .fn()
             .mockRejectedValueOnce(new Error('Failed to get repo'))
-        },
-      },
+        }
+      }
     }))
 
     await run()
