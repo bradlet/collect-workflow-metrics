@@ -4,10 +4,10 @@
 import { jest } from '@jest/globals'
 
 export const context = {
-  repo: jest.fn(() => ({
+  repo: {
     owner: 'owner',
     repo: 'repo',
-  })),
+  },
   runId: 123,
   runAttempt: 1,
 }
