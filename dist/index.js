@@ -31257,7 +31257,7 @@ async function run() {
       await octokit.rest.actions.getWorkflowRunAttempt({
         ...githubExports.context.repo,
         run_id: githubExports.context.runId,
-        attempt_number: githubExports.context.runAttempt
+        attempt_number: githubExports.context.runNumber
       });
 
     coreExports.debug(`Created at: ${created_at} | Updated at: ${updated_at}`);

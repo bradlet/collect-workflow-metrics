@@ -27,7 +27,7 @@ export async function run() {
       await octokit.rest.actions.getWorkflowRunAttempt({
         ...context.repo,
         run_id: context.runId,
-        attempt_number: context.runAttempt
+        attempt_number: context.runNumber
       })
 
     core.debug(`Created at: ${created_at} | Updated at: ${updated_at}`)
