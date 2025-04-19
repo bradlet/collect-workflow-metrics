@@ -1,12 +1,22 @@
-# Create a JavaScript Action
+_seeded from https://github.com/actions/javascript-action_
+
+# bradlet/collect-workflow-metrics
 
 [![GitHub Super-Linter](https://github.com/actions/javascript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/javascript-action/actions/workflows/ci.yml/badge.svg)
 
-## Initial Setup
+This action gathers rudimentary metrics about the calling workflow up until this
+action's step, and makes those metrics available as outputs for subsequent use.
 
-After you've cloned the repository to your local machine or codespace, you'll
-need to perform some initial setup steps before you can develop your action.
+Please open an issue at
+https://github.com/bradlet/collect-workflow-metrics/issues with requests for new
+metrics to be added!
+
+## Contributions
+
+After you've forked and cloned the repository to your local machine or
+codespace, you'll need to perform some initial setup steps before you can
+develop your action.
 
 > [!NOTE]
 >
@@ -41,12 +51,10 @@ need to perform some initial setup steps before you can develop your action.
    ...
    ```
 
-## Usage
+Please feel free to open PRs back to the original repo containing any
+improvements (e.g. new metrics)!
 
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md)
-in the GitHub Actions toolkit.
+## Usage
 
 To include the action in a workflow in another repository, you can use the
 `uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
@@ -58,20 +66,20 @@ steps:
     id: checkout
     uses: actions/checkout@v4
 
-  - name: Run my Action
-    id: run-action
-    uses: actions/javascript-action@v1 # Commit with the `v1` tag
+  - name: Collect Workflow Metrics
+    id: collect-metrics
+    uses: bradlet/collect-workflow-metrics@v1 # or any tag
     with:
-      milliseconds: 1000
+      github_token: ${{ secrets.GITHUB_TOKEN }}
 
   - name: Print Output
     id: output
-    run: echo "${{ steps.run-action.outputs.time }}"
+    run: echo "${{ steps.collect-metrics.outputs.workflow_runtime_human }}"
 ```
 
 ## Dependency License Management
 
-This template includes a GitHub Actions workflow,
+This repo includes a GitHub Actions workflow,
 [`licensed.yml`](./.github/workflows/licensed.yml), that uses
 [Licensed](https://github.com/licensee/licensed) to check for dependencies with
 missing or non-compliant licenses. This workflow is initially disabled. To
