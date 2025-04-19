@@ -1,7 +1,7 @@
 {
   "name": "collect-workflow-metrics",
   "description": "A Github Action for gathering metrics about workflow runs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Bradley Thompson (@bradlet)",
   "type": "module",
   "private": true,
