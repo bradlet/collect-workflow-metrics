@@ -1,16 +1,17 @@
-_seeded from https://github.com/actions/javascript-action_
-
 # bradlet/collect-workflow-metrics
 
 [![GitHub Super-Linter](https://github.com/actions/javascript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/javascript-action/actions/workflows/ci.yml/badge.svg)
 
+_seeded from
+[actions/javascript-action](https://github.com/actions/javascript-action)_
+
 This action gathers rudimentary metrics about the calling workflow up until this
 action's step, and makes those metrics available as outputs for subsequent use.
 
-Please open an issue at
-https://github.com/bradlet/collect-workflow-metrics/issues with requests for new
-metrics to be added!
+Please
+[open an issue](https://github.com/bradlet/collect-workflow-metrics/issues) with
+requests for new metrics to be added!
 
 ## Contributions
 
@@ -51,7 +52,7 @@ develop your action.
    ...
    ```
 
-Please feel free to open PRs back to the original repo containing any
+Please feel free to open PRs back to the original repository containing any
 improvements (e.g. new metrics)!
 
 ## Usage
@@ -79,7 +80,7 @@ steps:
 
 ## Dependency License Management
 
-This repo includes a GitHub Actions workflow,
+This repository includes a GitHub Actions workflow,
 [`licensed.yml`](./.github/workflows/licensed.yml), that uses
 [Licensed](https://github.com/licensee/licensed) to check for dependencies with
 missing or non-compliant licenses. This workflow is initially disabled. To
