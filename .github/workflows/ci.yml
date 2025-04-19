@@ -56,6 +56,11 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
+      
+      - name: Simulate runtime with sleep
+        run: |
+          echo "sleeping for 10 seconds"
+          sleep 10
 
       - name: Test Local Action
         id: test-action
