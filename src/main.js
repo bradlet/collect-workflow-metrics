@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
-import { wait } from './wait.js'
-
+import { context, getOctokit } from "@actions/github";
 /**
  * The main function for the action.
  *
@@ -8,18 +7,39 @@ import { wait } from './wait.js'
  */
 export async function run() {
   try {
-    const ms = core.getInput('milliseconds')
+    // This should be a token with access to your repository scoped in as a secret.
+    // The YML workflow will need to set github_token with the GitHub Secret Token
+    // github_token: ${{ secrets.GITHUB_TOKEN }}
+    const token = core.getInput('github_token');
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const octokit = getOctokit(token);
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const { created_at, updated_at } = await octokit.rest.actions.getWorkflowRunAttempt({
+      ...context.repo(),
+      run_id: context.runId,
+      attempt_number: context.runAttempt,
+    });
+
+    core.debug(`Created at: ${created_at} | Updated at: ${updated_at}`);
+    console.log(`Created at: ${created_at} | Updated at: ${updated_at}`);
+    const createdAt = Date.parse(created_at);
+    console.log(createdAt)
+    const updatedAt = Date.parse(updated_at);
+    console.log(updatedAt)
+    const diff = updatedAt - createdAt
+
+    console.log(diff)
+    // Calculate human readable format
+    const secs = Math.floor(diff / 1000);
+    const minutes = Math.floor(secs / 60);
+    const seconds = secs % 60;
+
+    console.log(secs)
+    console.log(minutes)
 
     // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('workflow_runtime_ms', diff)
+    core.setOutput('workflow_runtime_human', `${minutes}m ${seconds}s`);
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

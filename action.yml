@@ -1,23 +1,21 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Collect Workflow Metrics
+description: A Github Action for gathering metrics about workflow runs
+author: Bradley Thompson (@bradlet)
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: activity
+  color: white
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  github_token:
+    description: This should be a token with access to your repository scoped in as a secret.
     required: true
-    default: '1000'
 
-# Define your outputs here.
 outputs:
-  time:
-    description: Your output description here
+  workflow_runtime_ms:
+    description: The amount of time it took the calling workflow to run up until this action, in milliseconds.
+  workflow_runtime_human:
+    description: The amount of time it took the calling workflow to run up until this action, in a human-readable format.
 
 runs:
   using: node20
