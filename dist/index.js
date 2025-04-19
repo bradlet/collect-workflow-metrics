@@ -31256,16 +31256,17 @@ async function run() {
       })}`
     );
 
-    const { created_at, updated_at } =
-      await octokit.rest.actions.getWorkflowRunAttempt({
-        ...githubExports.context.repo,
-        run_id: githubExports.context.runId,
-        attempt_number: runAttempt
-      });
+    const { data } = await octokit.rest.actions.getWorkflowRunAttempt({
+      ...githubExports.context.repo,
+      run_id: githubExports.context.runId,
+      attempt_number: runAttempt
+    });
 
-    coreExports.debug(`Created at: ${created_at} | Updated at: ${updated_at}`);
-    const createdAt = Date.parse(created_at);
-    const updatedAt = Date.parse(updated_at);
+    coreExports.debug(
+      `Created at: ${data.created_at} | Updated at: ${data.updated_at}`
+    );
+    const createdAt = Date.parse(data.created_at);
+    const updatedAt = Date.parse(data.updated_at);
     const diff = updatedAt - createdAt;
     coreExports.debug('Diff: ' + diff);
 

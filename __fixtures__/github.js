@@ -16,8 +16,10 @@ export const getOctokit = jest.fn(() => ({
   rest: {
     actions: {
       getWorkflowRunAttempt: jest.fn().mockResolvedValue({
-        created_at: '2025-04-20T00:00:00Z',
-        updated_at: '2025-04-20T00:01:00Z'
+        data: {
+          created_at: '2025-04-20T00:00:00Z',
+          updated_at: '2025-04-20T00:01:00Z'
+        }
       })
     }
   }
