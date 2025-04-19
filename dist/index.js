@@ -31245,11 +31245,15 @@ async function run() {
 
     const octokit = githubExports.getOctokit(token);
 
+    // read run_attempt from the ENV
+    // It isn't available in the context object atm
+    const runAttempt = Number(process.env.GITHUB_RUN_ATTEMPT) || 1;
+
     coreExports.debug(
       `request body: ${JSON.stringify({
         ...githubExports.context.repo,
         run_id: githubExports.context.runId,
-        run_attempt: githubExports.context.runAttempt
+        attempt_number: runAttempt
       })}`
     );
 
@@ -31257,7 +31261,7 @@ async function run() {
       await octokit.rest.actions.getWorkflowRunAttempt({
         ...githubExports.context.repo,
         run_id: githubExports.context.runId,
-        attempt_number: githubExports.context.runNumber
+        attempt_number: runAttempt
       });
 
     coreExports.debug(`Created at: ${created_at} | Updated at: ${updated_at}`);

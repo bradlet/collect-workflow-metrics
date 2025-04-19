@@ -15,11 +15,15 @@ export async function run() {
 
     const octokit = getOctokit(token)
 
+    // read run_attempt from the ENV
+    // It isn't available in the context object atm
+    const runAttempt = Number(process.env.GITHUB_RUN_ATTEMPT) || 1
+
     core.debug(
       `request body: ${JSON.stringify({
         ...context.repo,
         run_id: context.runId,
-        run_attempt: context.runAttempt
+        attempt_number: runAttempt
       })}`
     )
 
@@ -27,7 +31,7 @@ export async function run() {
       await octokit.rest.actions.getWorkflowRunAttempt({
         ...context.repo,
         run_id: context.runId,
-        attempt_number: context.runNumber
+        attempt_number: runAttempt
       })
 
     core.debug(`Created at: ${created_at} | Updated at: ${updated_at}`)

@@ -9,7 +9,7 @@ export const context = {
     repo: 'repo'
   },
   runId: 123,
-  runNumber: 1
+  runAttempt: 1
 }
 
 export const getOctokit = jest.fn(() => ({
