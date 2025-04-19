@@ -18,9 +18,14 @@ jest.unstable_mockModule('@actions/github', () => github)
 const { run } = await import('../src/main.js')
 
 describe('main.js', () => {
+  const MOCKED_NOW = new Date('2025-04-20T00:01:00Z').getTime()
+
   beforeEach(() => {
     // Set the action's inputs as return values from core.getInput().
     core.getInput.mockImplementation(() => 'token')
+
+    // Return the fixed "now" timestamp
+    jest.spyOn(Date, 'now').mockReturnValue(MOCKED_NOW)
   })
 
   afterEach(() => {

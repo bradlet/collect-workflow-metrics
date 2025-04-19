@@ -7,6 +7,9 @@ import { context, getOctokit } from '@actions/github'
  */
 export async function run() {
   try {
+    const actionStartTime = Date.now()
+    core.debug('Action start time: ' + actionStartTime)
+
     // This should be a token with access to your repository scoped in as a secret.
     // The YML workflow will need to set github_token with the GitHub Secret Token
     // github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -32,12 +35,9 @@ export async function run() {
       attempt_number: runAttempt
     })
 
-    core.debug(
-      `Created at: ${data.created_at} | Updated at: ${data.updated_at}`
-    )
+    core.debug(`Created at: ${data.created_at}`)
     const createdAt = Date.parse(data.created_at)
-    const updatedAt = Date.parse(data.updated_at)
-    const diff = updatedAt - createdAt
+    const diff = actionStartTime - createdAt
     core.debug('Diff: ' + diff)
 
     // Calculate human readable format
