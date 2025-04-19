@@ -57,6 +57,8 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
+        env:
+          ACTIONS_STEP_DEBUG: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

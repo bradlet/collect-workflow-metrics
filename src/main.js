@@ -11,7 +11,6 @@ export async function run() {
     // The YML workflow will need to set github_token with the GitHub Secret Token
     // github_token: ${{ secrets.GITHUB_TOKEN }}
     const token = core.getInput('github_token')
-    core.debug(`Token: ${token}`)
 
     const octokit = getOctokit(token)
 
