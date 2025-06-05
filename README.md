@@ -6,12 +6,17 @@
 _seeded from
 [actions/javascript-action](https://github.com/actions/javascript-action)_
 
-This action gathers rudimentary metrics about the calling workflow up until this
-action's step, and makes those metrics available as outputs for subsequent use.
+This action gathers metrics about the calling workflow up until this action's
+step, and makes those metrics available as outputs for subsequent use.
 
 Please
 [open an issue](https://github.com/bradlet/collect-workflow-metrics/issues) with
 requests for new metrics to be added!
+
+## Supported Metrics
+
+- Pipeline Runtime
+- Average Leadtime
 
 ## Contributions
 
@@ -72,6 +77,8 @@ steps:
     uses: bradlet/collect-workflow-metrics@v1 # or any tag
     with:
       github_token: ${{ secrets.GITHUB_TOKEN }}
+      git_head: ${{ github.sha }}
+      git_base: main
 
   - name: Print Output
     id: output

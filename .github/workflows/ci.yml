@@ -67,8 +67,8 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_head: ${{ github.sha }}
-          github_base: main
+          git_head: ${{ github.sha }}
+          git_base: main
 
       - name: Print Output
         id: output
