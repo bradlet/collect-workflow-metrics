@@ -287,11 +287,8 @@ describe('main.js', () => {
     )
 
     // Verify that lead time outputs are set to 0
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_ms', 0)
-    expect(core.setOutput).toHaveBeenCalledWith(
-      'workflow_leadtime_human',
-      '0m 0s'
-    )
+    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_ms', '')
+    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_human', '')
   })
 
   it('Sets a failed status', async () => {

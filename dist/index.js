@@ -31331,8 +31331,8 @@ async function run() {
         coreExports.setOutput('workflow_leadtime_human', leadTimeHuman);
       } else {
         coreExports.debug('No commits found between the specified refs');
-        coreExports.setOutput('workflow_leadtime_ms', 0);
-        coreExports.setOutput('workflow_leadtime_human', '0m 0s');
+        coreExports.setOutput('workflow_leadtime_ms', '');
+        coreExports.setOutput('workflow_leadtime_human', '');
       }
     } else {
       coreExports.debug('Lead time is skipped due to absent git ref inputs');
