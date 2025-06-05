@@ -31244,6 +31244,8 @@ async function run() {
     // The YML workflow will need to set github_token with the GitHub Secret Token
     // github_token: ${{ secrets.GITHUB_TOKEN }}
     const token = coreExports.getInput('github_token');
+    const gitHead = coreExports.getInput('git_head');
+    const gitBase = coreExports.getInput('git_base');
 
     const octokit = githubExports.getOctokit(token);
 
@@ -31279,6 +31281,61 @@ async function run() {
     // Set outputs for other workflow steps to use
     coreExports.setOutput('workflow_runtime_ms', diff);
     coreExports.setOutput('workflow_runtime_human', `${minutes}m ${seconds}s`);
+
+    // Calculate lead time if both git_head and git_base are provided
+    if (gitHead && gitBase) {
+      coreExports.debug(
+        `Calculating lead time between base: ${gitBase} and head: ${gitHead}`
+      );
+
+      const { data: compareData } = await octokit.rest.repos.compareCommits({
+        owner: githubExports.context.repo.owner,
+        repo: githubExports.context.repo.repo,
+        base: gitBase,
+        head: gitHead
+      });
+
+      if (compareData.commits && compareData.commits.length > 0) {
+        // Calculate lead time for each commit
+        const leadTimes = compareData.commits.map((commit) => {
+          const commitTime = Date.parse(commit.commit.author.date);
+          return actionStartTime - commitTime
+        });
+
+        // Calculate average lead time
+        const averageLeadTime = Math.floor(
+          leadTimes.reduce((sum, time) => sum + time, 0) / leadTimes.length
+        );
+
+        coreExports.debug(`Average lead time: ${averageLeadTime}ms`);
+
+        // Calculate human readable format for lead time
+        const leadTimeSecs = Math.floor(averageLeadTime / 1000);
+        const leadTimeMinutes = Math.floor(leadTimeSecs / 60);
+        const leadTimeSeconds = leadTimeSecs % 60;
+        const leadTimeHours = Math.floor(leadTimeMinutes / 60);
+        const remainingMinutes = leadTimeMinutes % 60;
+
+        let leadTimeHuman;
+        if (leadTimeHours > 0) {
+          leadTimeHuman = `${leadTimeHours}h ${remainingMinutes}m ${leadTimeSeconds}s`;
+        } else {
+          leadTimeHuman = `${leadTimeMinutes}m ${leadTimeSeconds}s`;
+        }
+
+        coreExports.debug(`Lead time: ${leadTimeHuman}`);
+
+        // Set lead time outputs
+        coreExports.setOutput('workflow_leadtime_ms', averageLeadTime);
+        coreExports.setOutput('workflow_leadtime_human', leadTimeHuman);
+      } else {
+        coreExports.debug('No commits found between the specified refs');
+        coreExports.setOutput('workflow_leadtime_ms', 0);
+        coreExports.setOutput('workflow_leadtime_human', '0m 0s');
+      }
+    } else {
+      coreExports.debug('Lead time is skipped due to absent git ref inputs');
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) coreExports.setFailed(error.message);
