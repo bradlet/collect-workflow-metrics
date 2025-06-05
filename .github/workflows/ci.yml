@@ -77,7 +77,7 @@ jobs:
           steps.test-action.outputs.workflow_runtime_ms }}
           workflow_runtime_human ${{
           steps.test-action.outputs.workflow_runtime_human }}
-          workflow_lead_time_ms ${{
-          steps.test-action.outputs.workflow_lead_time_ms }}
-          workflow_lead_time_human ${{
-          steps.test-action.outputs.workflow_lead_time_human }}"
+          workflow_leadtime_ms ${{
+          steps.test-action.outputs.workflow_leadtime_ms }}
+          workflow_leadtime_human ${{
+          steps.test-action.outputs.workflow_leadtime_human }}"
