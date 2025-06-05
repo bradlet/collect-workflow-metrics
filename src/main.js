@@ -14,6 +14,8 @@ export async function run() {
     // The YML workflow will need to set github_token with the GitHub Secret Token
     // github_token: ${{ secrets.GITHUB_TOKEN }}
     const token = core.getInput('github_token')
+    const gitHead = core.getInput('git_head')
+    const gitBase = core.getInput('git_base')
 
     const octokit = getOctokit(token)
 
@@ -49,6 +51,61 @@ export async function run() {
     // Set outputs for other workflow steps to use
     core.setOutput('workflow_runtime_ms', diff)
     core.setOutput('workflow_runtime_human', `${minutes}m ${seconds}s`)
+
+    // Calculate lead time if both git_head and git_base are provided
+    if (gitHead && gitBase) {
+      core.debug(
+        `Calculating lead time between base: ${gitBase} and head: ${gitHead}`
+      )
+
+      const { data: compareData } = await octokit.rest.repos.compareCommits({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        base: gitBase,
+        head: gitHead
+      })
+
+      if (compareData.commits && compareData.commits.length > 0) {
+        // Calculate lead time for each commit
+        const leadTimes = compareData.commits.map((commit) => {
+          const commitTime = Date.parse(commit.commit.author.date)
+          return actionStartTime - commitTime
+        })
+
+        // Calculate average lead time
+        const averageLeadTime = Math.floor(
+          leadTimes.reduce((sum, time) => sum + time, 0) / leadTimes.length
+        )
+
+        core.debug(`Average lead time: ${averageLeadTime}ms`)
+
+        // Calculate human readable format for lead time
+        const leadTimeSecs = Math.floor(averageLeadTime / 1000)
+        const leadTimeMinutes = Math.floor(leadTimeSecs / 60)
+        const leadTimeSeconds = leadTimeSecs % 60
+        const leadTimeHours = Math.floor(leadTimeMinutes / 60)
+        const remainingMinutes = leadTimeMinutes % 60
+
+        let leadTimeHuman
+        if (leadTimeHours > 0) {
+          leadTimeHuman = `${leadTimeHours}h ${remainingMinutes}m ${leadTimeSeconds}s`
+        } else {
+          leadTimeHuman = `${leadTimeMinutes}m ${leadTimeSeconds}s`
+        }
+
+        core.debug(`Lead time: ${leadTimeHuman}`)
+
+        // Set lead time outputs
+        core.setOutput('workflow_leadtime_ms', averageLeadTime)
+        core.setOutput('workflow_leadtime_human', leadTimeHuman)
+      } else {
+        core.debug('No commits found between the specified refs')
+        core.setOutput('workflow_leadtime_ms', '')
+        core.setOutput('workflow_leadtime_human', '')
+      }
+    } else {
+      core.debug('Lead time is skipped due to absent git ref inputs')
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

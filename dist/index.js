@@ -27311,6 +27311,7 @@ function requireContext () {
 	        this.action = process.env.GITHUB_ACTION;
 	        this.actor = process.env.GITHUB_ACTOR;
 	        this.job = process.env.GITHUB_JOB;
+	        this.runAttempt = parseInt(process.env.GITHUB_RUN_ATTEMPT, 10);
 	        this.runNumber = parseInt(process.env.GITHUB_RUN_NUMBER, 10);
 	        this.runId = parseInt(process.env.GITHUB_RUN_ID, 10);
 	        this.apiUrl = (_a = process.env.GITHUB_API_URL) !== null && _a !== void 0 ? _a : `https://api.github.com`;
@@ -27624,7 +27625,7 @@ function requireBeforeAfterHook () {
 
 var beforeAfterHookExports = requireBeforeAfterHook();
 
-const VERSION$5 = "9.0.5";
+const VERSION$5 = "9.0.6";
 
 const userAgent = `octokit-endpoint.js/${VERSION$5} ${getUserAgent()}`;
 const DEFAULTS = {
@@ -27721,9 +27722,9 @@ function addQueryParameters(url, parameters) {
   }).join("&");
 }
 
-const urlVariableRegex = /\{[^}]+\}/g;
+const urlVariableRegex = /\{[^{}}]+\}/g;
 function removeNonChars(variableName) {
-  return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
+  return variableName.replace(/(?:^\W+)|(?:(?<!\W)\W+$)/g, "").split(/,/);
 }
 function extractUrlVariableNames(url) {
   const matches = url.match(urlVariableRegex);
@@ -27906,7 +27907,7 @@ function parse(options) {
     }
     if (url.endsWith("/graphql")) {
       if (options.mediaType.previews?.length) {
-        const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
+        const previewsFromAcceptHeader = headers.accept.match(/(?<![\w-])[\w-]+(?=-preview)/g) || [];
         headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map((preview) => {
           const format = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
           return `application/vnd.github.${preview}-preview${format}`;
@@ -27955,7 +27956,7 @@ function withDefaults$2(oldDefaults, newDefaults) {
 
 const endpoint = withDefaults$2(null, DEFAULTS);
 
-const VERSION$4 = "8.4.0";
+const VERSION$4 = "8.4.1";
 
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null)
@@ -28103,7 +28104,7 @@ class RequestError extends Error {
     if (options.request.headers.authorization) {
       requestCopy.headers = Object.assign({}, options.request.headers, {
         authorization: options.request.headers.authorization.replace(
-          / .*$/,
+          /(?<! ) .*$/,
           " [REDACTED]"
         )
       });
@@ -28171,7 +28172,7 @@ function fetchWrapper(requestOptions) {
       headers[keyAndValue[0]] = keyAndValue[1];
     }
     if ("deprecation" in headers) {
-      const matches = headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
+      const matches = headers.link && headers.link.match(/<([^<>]+)>; rel="deprecation"/);
       const deprecationLink = matches && matches.pop();
       log.warn(
         `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
@@ -30740,7 +30741,7 @@ var distSrc = /*#__PURE__*/Object.freeze({
 var require$$3 = /*@__PURE__*/getAugmentedNamespace(distSrc);
 
 // pkg/dist-src/version.js
-var VERSION = "9.2.1";
+var VERSION = "9.2.2";
 
 // pkg/dist-src/normalize-paginated-list-response.js
 function normalizePaginatedListResponse(response) {
@@ -30788,7 +30789,7 @@ function iterator(octokit, route, parameters) {
           const response = await requestMethod({ method, url, headers });
           const normalizedResponse = normalizePaginatedListResponse(response);
           url = ((normalizedResponse.headers.link || "").match(
-            /<([^>]+)>;\s*rel="next"/
+            /<([^<>]+)>;\s*rel="next"/
           ) || [])[1];
           return { value: normalizedResponse };
         } catch (error) {
@@ -31244,6 +31245,8 @@ async function run() {
     // The YML workflow will need to set github_token with the GitHub Secret Token
     // github_token: ${{ secrets.GITHUB_TOKEN }}
     const token = coreExports.getInput('github_token');
+    const gitHead = coreExports.getInput('git_head');
+    const gitBase = coreExports.getInput('git_base');
 
     const octokit = githubExports.getOctokit(token);
 
@@ -31279,6 +31282,61 @@ async function run() {
     // Set outputs for other workflow steps to use
     coreExports.setOutput('workflow_runtime_ms', diff);
     coreExports.setOutput('workflow_runtime_human', `${minutes}m ${seconds}s`);
+
+    // Calculate lead time if both git_head and git_base are provided
+    if (gitHead && gitBase) {
+      coreExports.debug(
+        `Calculating lead time between base: ${gitBase} and head: ${gitHead}`
+      );
+
+      const { data: compareData } = await octokit.rest.repos.compareCommits({
+        owner: githubExports.context.repo.owner,
+        repo: githubExports.context.repo.repo,
+        base: gitBase,
+        head: gitHead
+      });
+
+      if (compareData.commits && compareData.commits.length > 0) {
+        // Calculate lead time for each commit
+        const leadTimes = compareData.commits.map((commit) => {
+          const commitTime = Date.parse(commit.commit.author.date);
+          return actionStartTime - commitTime
+        });
+
+        // Calculate average lead time
+        const averageLeadTime = Math.floor(
+          leadTimes.reduce((sum, time) => sum + time, 0) / leadTimes.length
+        );
+
+        coreExports.debug(`Average lead time: ${averageLeadTime}ms`);
+
+        // Calculate human readable format for lead time
+        const leadTimeSecs = Math.floor(averageLeadTime / 1000);
+        const leadTimeMinutes = Math.floor(leadTimeSecs / 60);
+        const leadTimeSeconds = leadTimeSecs % 60;
+        const leadTimeHours = Math.floor(leadTimeMinutes / 60);
+        const remainingMinutes = leadTimeMinutes % 60;
+
+        let leadTimeHuman;
+        if (leadTimeHours > 0) {
+          leadTimeHuman = `${leadTimeHours}h ${remainingMinutes}m ${leadTimeSeconds}s`;
+        } else {
+          leadTimeHuman = `${leadTimeMinutes}m ${leadTimeSeconds}s`;
+        }
+
+        coreExports.debug(`Lead time: ${leadTimeHuman}`);
+
+        // Set lead time outputs
+        coreExports.setOutput('workflow_leadtime_ms', averageLeadTime);
+        coreExports.setOutput('workflow_leadtime_human', leadTimeHuman);
+      } else {
+        coreExports.debug('No commits found between the specified refs');
+        coreExports.setOutput('workflow_leadtime_ms', '');
+        coreExports.setOutput('workflow_leadtime_human', '');
+      }
+    } else {
+      coreExports.debug('Lead time is skipped due to absent git ref inputs');
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) coreExports.setFailed(error.message);

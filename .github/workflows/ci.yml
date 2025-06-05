@@ -67,6 +67,8 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_head: ${{ github.sha }}
+          git_base: main
 
       - name: Print Output
         id: output
@@ -74,4 +76,8 @@ jobs:
           echo "workflow_runtime_ms ${{
           steps.test-action.outputs.workflow_runtime_ms }}
           workflow_runtime_human ${{
-          steps.test-action.outputs.workflow_runtime_human }}"
+          steps.test-action.outputs.workflow_runtime_human }}
+          workflow_leadtime_ms ${{
+          steps.test-action.outputs.workflow_leadtime_ms }}
+          workflow_leadtime_human ${{
+          steps.test-action.outputs.workflow_leadtime_human }}"

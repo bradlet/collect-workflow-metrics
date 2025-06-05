@@ -12,6 +12,18 @@ inputs:
       This should be a token with access to your repository scoped in as a
       secret.
     required: true
+  git_head:
+    description:
+      The git ref (branch, tag, or commit SHA) to use as the head for lead time
+      calculation. If provided along with git_base, lead time will be
+      calculated.
+    required: false
+  git_base:
+    description:
+      The git ref (branch, tag, or commit SHA) to use as the base for lead time
+      calculation. If provided along with git_head, lead time will be
+      calculated.
+    required: false
 
 outputs:
   workflow_runtime_ms:
@@ -22,6 +34,16 @@ outputs:
     description:
       The amount of time it took the calling workflow to run up until this
       action, in a human-readable format.
+  workflow_leadtime_ms:
+    description:
+      The average lead time for changes between git_base and git_head refs, in
+      milliseconds. Only set when both git_head and git_base inputs are
+      provided.
+  workflow_leadtime_human:
+    description:
+      The average lead time for changes between git_base and git_head refs, in a
+      human-readable format. Only set when both git_head and git_base inputs are
+      provided.
 
 runs:
   using: node20
