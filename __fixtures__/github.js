@@ -21,6 +21,28 @@ export const getOctokit = jest.fn(() => ({
           updated_at: '2025-04-20T00:01:00Z'
         }
       })
+    },
+    repos: {
+      compareCommits: jest.fn().mockResolvedValue({
+        data: {
+          commits: [
+            {
+              commit: {
+                author: {
+                  date: '2025-04-19T23:50:00Z' // 10 minutes before action start
+                }
+              }
+            },
+            {
+              commit: {
+                author: {
+                  date: '2025-04-19T23:40:00Z' // 20 minutes before action start
+                }
+              }
+            }
+          ]
+        }
+      })
     }
   }
 }))
