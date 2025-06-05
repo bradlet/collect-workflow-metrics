@@ -95,12 +95,17 @@ describe('main.js', () => {
     await run()
 
     // Verify debug message about skipping lead time
-    expect(core.debug).toHaveBeenCalledWith('Lead time is skipped due to absent git ref inputs')
-    
+    expect(core.debug).toHaveBeenCalledWith(
+      'Lead time is skipped due to absent git ref inputs'
+    )
+
     // Verify that only workflow runtime outputs are set (not lead time outputs)
     expect(core.setOutput).toHaveBeenCalledTimes(2)
     expect(core.setOutput).toHaveBeenCalledWith('workflow_runtime_ms', 60_000)
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_runtime_human', '1m 0s')
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_runtime_human',
+      '1m 0s'
+    )
   })
 
   it('Skips lead time calculation when only git_head is provided', async () => {
@@ -113,8 +118,10 @@ describe('main.js', () => {
     await run()
 
     // Verify debug message about skipping lead time
-    expect(core.debug).toHaveBeenCalledWith('Lead time is skipped due to absent git ref inputs')
-    
+    expect(core.debug).toHaveBeenCalledWith(
+      'Lead time is skipped due to absent git ref inputs'
+    )
+
     // Verify that only workflow runtime outputs are set
     expect(core.setOutput).toHaveBeenCalledTimes(2)
   })
@@ -129,8 +136,10 @@ describe('main.js', () => {
     await run()
 
     // Verify debug message about skipping lead time
-    expect(core.debug).toHaveBeenCalledWith('Lead time is skipped due to absent git ref inputs')
-    
+    expect(core.debug).toHaveBeenCalledWith(
+      'Lead time is skipped due to absent git ref inputs'
+    )
+
     // Verify that only workflow runtime outputs are set
     expect(core.setOutput).toHaveBeenCalledTimes(2)
   })
@@ -164,9 +173,18 @@ describe('main.js', () => {
     // Verify all outputs were set
     expect(core.setOutput).toHaveBeenCalledTimes(4)
     expect(core.setOutput).toHaveBeenCalledWith('workflow_runtime_ms', 60_000)
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_runtime_human', '1m 0s')
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_ms', expectedLeadTimeMs)
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_human', expectedLeadTimeHuman)
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_runtime_human',
+      '1m 0s'
+    )
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_leadtime_ms',
+      expectedLeadTimeMs
+    )
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_leadtime_human',
+      expectedLeadTimeHuman
+    )
   })
 
   it('Handles lead time calculation with hours', async () => {
@@ -222,8 +240,14 @@ describe('main.js', () => {
     const expectedLeadTimeMs = 10_800_000
     const expectedLeadTimeHuman = '3h 0m 0s'
 
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_ms', expectedLeadTimeMs)
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_human', expectedLeadTimeHuman)
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_leadtime_ms',
+      expectedLeadTimeMs
+    )
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_leadtime_human',
+      expectedLeadTimeHuman
+    )
   })
 
   it('Handles case when no commits are found between refs', async () => {
@@ -258,11 +282,16 @@ describe('main.js', () => {
     await run()
 
     // Verify debug message about no commits
-    expect(core.debug).toHaveBeenCalledWith('No commits found between the specified refs')
-    
+    expect(core.debug).toHaveBeenCalledWith(
+      'No commits found between the specified refs'
+    )
+
     // Verify that lead time outputs are set to 0
     expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_ms', 0)
-    expect(core.setOutput).toHaveBeenCalledWith('workflow_leadtime_human', '0m 0s')
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'workflow_leadtime_human',
+      '0m 0s'
+    )
   })
 
   it('Sets a failed status', async () => {
@@ -301,7 +330,9 @@ describe('main.js', () => {
           })
         },
         repos: {
-          compareCommits: jest.fn().mockRejectedValueOnce(new Error('Failed to compare commits'))
+          compareCommits: jest
+            .fn()
+            .mockRejectedValueOnce(new Error('Failed to compare commits'))
         }
       }
     }))

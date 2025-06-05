@@ -54,8 +54,10 @@ export async function run() {
 
     // Calculate lead time if both git_head and git_base are provided
     if (gitHead && gitBase) {
-      core.debug(`Calculating lead time between base: ${gitBase} and head: ${gitHead}`)
-      
+      core.debug(
+        `Calculating lead time between base: ${gitBase} and head: ${gitHead}`
+      )
+
       const { data: compareData } = await octokit.rest.repos.compareCommits({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -65,14 +67,16 @@ export async function run() {
 
       if (compareData.commits && compareData.commits.length > 0) {
         // Calculate lead time for each commit
-        const leadTimes = compareData.commits.map(commit => {
+        const leadTimes = compareData.commits.map((commit) => {
           const commitTime = Date.parse(commit.commit.author.date)
           return actionStartTime - commitTime
         })
 
         // Calculate average lead time
-        const averageLeadTime = Math.floor(leadTimes.reduce((sum, time) => sum + time, 0) / leadTimes.length)
-        
+        const averageLeadTime = Math.floor(
+          leadTimes.reduce((sum, time) => sum + time, 0) / leadTimes.length
+        )
+
         core.debug(`Average lead time: ${averageLeadTime}ms`)
 
         // Calculate human readable format for lead time
